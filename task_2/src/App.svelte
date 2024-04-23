@@ -1,47 +1,90 @@
 <script lang="ts">
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from '/vite.svg'
-  import Counter from './lib/Counter.svelte'
+	import { onMount } from 'svelte';
+  import Select from "./lib/select.svelte";
+  import Input from './lib/input.svelte';
+  import currenciesOptions from './utils/currencies.ts';
+  import {fetchExchangeRate} from './utils/api.ts';
+
+  const exchangeInfo = {
+   selectedFrom: 'RUB',
+   selectedTo: 'USD',
+   currentRate: 0,
+   inputFrom: 1,
+   inputTo: 0,
+  }
+
+  onMount(()=>{
+    fetchExchangeRate(exchangeInfo.selectedFrom).then((res) => {
+      exchangeInfo.currentRate = res.rates[exchangeInfo.selectedTo]
+    });
+  })
+
+  const setCurrentRate = (e) => {
+    const { name, value } = e.target;
+    exchangeInfo[name] = value;
+    fetchExchangeRate(value).then((res) => {
+      exchangeInfo.currentRate = res.rates[name === 'selectedFrom' ? exchangeInfo.selectedTo : exchangeInfo.selectedFrom ]
+    });
+    console.log('exchangeInfo', exchangeInfo);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    console.log(name, value);
+    console.log('exchangeInfo', exchangeInfo);
+    if(name === "inputFrom"){
+      exchangeInfo.inputFrom = value;
+      exchangeInfo.inputTo = exchangeInfo.inputFrom * exchangeInfo.currentRate
+    }
+    if(name === "inputTo"){
+      exchangeInfo.inputTo = value;
+      exchangeInfo.inputFrom = exchangeInfo.inputFrom / exchangeInfo.currentRate
+    }
+  };
+
 </script>
 
-<main>
-  <div>
-    <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-      <img src={viteLogo} class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer">
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
+<main class="main">
+  <div class="block">
+    <Select
+      title="У меня есть"
+      value={exchangeInfo.selectedFrom}
+      handleSelectChange="{setCurrentRate}"
+      name="selectedFrom"
+      options="{currenciesOptions}"
+    />
+    <Input
+      value={exchangeInfo.inputFrom}
+      name="inputFrom"
+      {handleInputChange}
+    />
   </div>
-  <h1>Vite + Svelte</h1>
 
-  <div class="card">
-    <Counter />
+  <div class="block">
+    <Select
+      title="Хочу приобрести"
+      value={exchangeInfo.selectedTo}
+      handleSelectChange="{setCurrentRate}"
+      name="selectedTo"
+      options="{currenciesOptions}"
+    />    
+    <Input
+      value={exchangeInfo.inputTo}
+      name="inputTo"
+      {handleInputChange}
+    />
   </div>
-
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer">SvelteKit</a>, the official Svelte app framework powered by Vite!
-  </p>
-
-  <p class="read-the-docs">
-    Click on the Vite and Svelte logos to learn more
-  </p>
 </main>
 
 <style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
+  .main {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
   }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
+  .block {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
 </style>
