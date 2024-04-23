@@ -13,18 +13,20 @@
    inputTo: 0,
   }
 
-  onMount(()=>{
+  const setCurrentRate = () =>{
     fetchExchangeRate(exchangeInfo.selectedFrom).then((res) => {
       exchangeInfo.currentRate = res.rates[exchangeInfo.selectedTo]
     });
+  }
+
+  onMount(()=>{
+    setCurrentRate();
   })
 
-  const setCurrentRate = (e) => {
+  const handleCurrentRate = async (e) => {
     const { name, value } = e.target;
     exchangeInfo[name] = value;
-    fetchExchangeRate(value).then((res) => {
-      exchangeInfo.currentRate = res.rates[name === 'selectedFrom' ? exchangeInfo.selectedTo : exchangeInfo.selectedFrom ]
-    });
+    await setCurrentRate();
     console.log('exchangeInfo', exchangeInfo);
   };
 
@@ -49,7 +51,7 @@
     <Select
       title="У меня есть"
       value={exchangeInfo.selectedFrom}
-      handleSelectChange="{setCurrentRate}"
+      handleSelectChange="{handleCurrentRate}"
       name="selectedFrom"
       options="{currenciesOptions}"
     />
@@ -64,7 +66,7 @@
     <Select
       title="Хочу приобрести"
       value={exchangeInfo.selectedTo}
-      handleSelectChange="{setCurrentRate}"
+      handleSelectChange="{handleCurrentRate}"
       name="selectedTo"
       options="{currenciesOptions}"
     />    

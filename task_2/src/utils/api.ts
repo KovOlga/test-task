@@ -1,5 +1,5 @@
-export const fetchExchangeRate = (endPoint: string) => {
-  return fetch(`https://open.er-api.com/v6/latest/${endPoint}`, {
+export const fetchExchangeRate = (codeEndPoint: string) => {
+  return fetch(`https://open.er-api.com/v6/latest/${codeEndPoint}`, {
     method: "GET",
   }).then((res) => {
     if (res.ok) {
