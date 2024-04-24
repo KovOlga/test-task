@@ -1,30 +1,25 @@
 import { encoded, translations } from "./data.js";
 
 console.log("Let's rock");
-// console.log(encoded, translations);
 
-const keysToDecode = Object.keys(encoded[0]).filter((key) => {
-  if (
-    encoded[0][key] &&
-    key.indexOf("Id") != -1 &&
-    key !== "groupId" &&
-    key !== "service" &&
-    key !== "formatSize" &&
-    key !== "ca"
-  ) {
-    return key;
-  }
-});
+const keysToIgnore = ["groupId", "service", "formatSize", "ca"];
 
-// console.log("keysToDecode", keysToDecode);
+const decode = (arr, decodingObjList, keysToIgnore) => {
+  const uniqueIdSet = new Set();
 
-const decoded = encoded.map((item) => {
-  keysToDecode.forEach((key) => {
-    if (translations[item[key]] !== undefined && item[key]) {
-      item[key] = translations[item[key]];
+  for (let i = 0; i < arr.length; i++) {
+    for (let [key, value] of Object.entries(arr[i])) {
+      if (key.indexOf("Id") !== -1) {
+        uniqueIdSet.add(value);
+      }
+      if (keysToIgnore.includes(key)) continue;
+      arr[i][key] = decodingObjList[value] ?? value;
     }
-  });
-  return item;
-});
+  }
+  return { arr, uniqueIdSet };
+};
 
-console.log(decoded);
+const decoded = decode(encoded, translations, keysToIgnore);
+
+console.log("Раскодированный массив объектов:", decoded.arr);
+console.log("Список уникальных id:", decoded.uniqueIdSet);
