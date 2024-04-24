@@ -1,51 +1,49 @@
-<script lang="ts">
-	import { onMount } from 'svelte';
+<script>
+  import { onMount } from 'svelte';
   import Select from "./lib/select.svelte";
   import Input from './lib/input.svelte';
   import currenciesOptions from './utils/currencies.ts';
-  import {fetchExchangeRate} from './utils/api.ts';
+  import { fetchExchangeRate } from './utils/api.ts';
 
   const exchangeInfo = {
-   selectedFrom: 'RUB',
-   selectedTo: 'USD',
-   currentRate: 0,
-   inputFrom: 100,
-   inputTo: 0,
-  }
+    selectedFrom: "RUB",
+    selectedTo: "USD",
+    currentRate: 0,
+    inputFrom: 100,
+    inputTo: 0,
+  };
 
-  const setCurrentRate = () =>{
+  const setCurrentRate = () => {
     fetchExchangeRate(exchangeInfo.selectedFrom).then((res) => {
       exchangeInfo.currentRate = res.rates[exchangeInfo.selectedTo];
       exchangeInfo.inputTo = exchangeInfo.inputFrom * exchangeInfo.currentRate;
     });
-  }
+  };
 
-  onMount(()=>{
+  onMount(() => {
     setCurrentRate();
-  })
+  });
 
   const handleCurrentRate = async (e) => {
     const { name, value } = e.target;
     exchangeInfo[name] = value;
     await setCurrentRate();
-    console.log('exchangeInfo', exchangeInfo);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if(isNaN(value)){
+    if (isNaN(value)) {
       exchangeInfo[name] = exchangeInfo[name];
     } else {
       exchangeInfo[name] = Number(value);
     }
-    if(name === "inputFrom"){
-      exchangeInfo.inputTo = exchangeInfo.inputFrom * exchangeInfo.currentRate
+    if (name === "inputFrom") {
+      exchangeInfo.inputTo = exchangeInfo.inputFrom * exchangeInfo.currentRate;
     }
-    if(name === "inputTo"){
-      exchangeInfo.inputFrom = exchangeInfo.inputTo / exchangeInfo.currentRate
+    if (name === "inputTo") {
+      exchangeInfo.inputFrom = exchangeInfo.inputTo / exchangeInfo.currentRate;
     }
   };
-
 </script>
 
 <main class="main">
@@ -55,9 +53,9 @@
       value={exchangeInfo.selectedFrom}
       handleSelectChange="{handleCurrentRate}"
       name="selectedFrom"
-      options="{currenciesOptions}"
+      options={currenciesOptions}
     />
-    <Input
+    <input
       value={exchangeInfo.inputFrom}
       name="inputFrom"
       {handleInputChange}
@@ -70,13 +68,9 @@
       value={exchangeInfo.selectedTo}
       handleSelectChange="{handleCurrentRate}"
       name="selectedTo"
-      options="{currenciesOptions}"
-    />    
-    <Input
-      value={exchangeInfo.inputTo}
-      name="inputTo"
-      {handleInputChange}
+      options={currenciesOptions}
     />
+    <input value="{exchangeInfo.inputTo}" name="inputTo" {handleInputChange} />
   </div>
 </main>
 
