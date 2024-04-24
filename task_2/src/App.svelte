@@ -9,13 +9,14 @@
    selectedFrom: 'RUB',
    selectedTo: 'USD',
    currentRate: 0,
-   inputFrom: 1,
+   inputFrom: 100,
    inputTo: 0,
   }
 
   const setCurrentRate = () =>{
     fetchExchangeRate(exchangeInfo.selectedFrom).then((res) => {
-      exchangeInfo.currentRate = res.rates[exchangeInfo.selectedTo]
+      exchangeInfo.currentRate = res.rates[exchangeInfo.selectedTo];
+      exchangeInfo.inputTo = exchangeInfo.inputFrom * exchangeInfo.currentRate;
     });
   }
 
@@ -32,15 +33,16 @@
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
-    console.log('exchangeInfo', exchangeInfo);
+    if(isNaN(value)){
+      exchangeInfo[name] = exchangeInfo[name];
+    } else {
+      exchangeInfo[name] = Number(value);
+    }
     if(name === "inputFrom"){
-      exchangeInfo.inputFrom = value;
       exchangeInfo.inputTo = exchangeInfo.inputFrom * exchangeInfo.currentRate
     }
     if(name === "inputTo"){
-      exchangeInfo.inputTo = value;
-      exchangeInfo.inputFrom = exchangeInfo.inputFrom / exchangeInfo.currentRate
+      exchangeInfo.inputFrom = exchangeInfo.inputTo / exchangeInfo.currentRate
     }
   };
 
