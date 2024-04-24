@@ -24,7 +24,7 @@
     setCurrentRate();
   });
 
-  const handleCurrentRate = async (e) => {
+  const handleRateChange = async (e) => {
     const { name, value } = e.target;
     exchangeInfo[name] = value;
     await setCurrentRate();
@@ -51,11 +51,11 @@
     <Select
       title="У меня есть"
       value={exchangeInfo.selectedFrom}
-      handleSelectChange="{handleCurrentRate}"
+      handleSelectChange="{handleRateChange}"
       name="selectedFrom"
       options={currenciesOptions}
     />
-    <input
+    <Input
       value={exchangeInfo.inputFrom}
       name="inputFrom"
       {handleInputChange}
@@ -66,11 +66,11 @@
     <Select
       title="Хочу приобрести"
       value={exchangeInfo.selectedTo}
-      handleSelectChange="{handleCurrentRate}"
+      handleSelectChange="{handleRateChange}"
       name="selectedTo"
       options={currenciesOptions}
     />
-    <input value="{exchangeInfo.inputTo}" name="inputTo" {handleInputChange} />
+    <Input value="{exchangeInfo.inputTo}" name="inputTo" {handleInputChange} />
   </div>
 </main>
 
